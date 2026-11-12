@@ -44,6 +44,7 @@ import time
 from contextvars import ContextVar
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
+from typing import Union
 
 import sqlalchemy as sa
 from celery import current_app as current_celery_app
@@ -84,7 +85,7 @@ PROGRESS = "PROGRESS"
 LOST_MESSAGE = "The task stopped responding and was abandoned"
 
 _table = TaskTree.__table__
-_current_task_id: ContextVar[str | None] = ContextVar("current_task_id", default=None)
+_current_task_id: ContextVar[Union[str, None]] = ContextVar("current_task_id", default=None)
 
 
 class TaskLocked(Exception):
@@ -99,7 +100,7 @@ def _now() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
-def _dump(value: Any) -> str | None:
+def _dump(value: Any) -> Union[str, None]:
     """Serialize a result or progress dict, including Gramps objects."""
     if value is None:
         return None
@@ -129,7 +130,7 @@ def _update(engine: sa.Engine, *where, **values) -> int:
     return _execute(engine, sa.update(_table).where(*where).values(**values))
 
 
-def reap(tree: str | None) -> None:
+def reap(tree: Union[str, None]) -> None:
     """Mark the tree's active tasks that stopped responding as lost.
 
     A running task is stale once its heartbeat is older than
@@ -162,8 +163,8 @@ def reap(tree: str | None) -> None:
 
 
 def acquire(
-    task_id: str, name: str, tree: str | None, user_id: str | None, lock_key: str | None
-) -> str | None:
+    task_id: str, name: str, tree: Union[str, None], user_id: Union[str, None], lock_key: Union[str, None]
+) -> Union[str, None]:
     """Record a task as queued, taking its lock if it has a key.
 
     Returns None if the task was recorded and must be dispatched. With a
@@ -310,7 +311,7 @@ def _finish(
 
 
 def run_tracked(
-    task_id: str | None, run: Callable[[], Any], fence: bool = False
+    task_id: Union[str, None], run: Callable[[], Any], fence: bool = False
 ) -> Any:
     """Run a task body under its task_tree row.
 

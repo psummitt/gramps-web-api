@@ -20,6 +20,7 @@
 """Holidays API resource."""
 
 from __future__ import annotations
+from typing import Union
 
 from flask import Response, abort
 from gramps.plugins.lib.libholiday import HolidayTable
@@ -52,10 +53,10 @@ class HolidayResource(ProtectedResource, GrampsJSONEncoder):
     def get(
         self,
         args,
-        country: str | None = None,
-        year: int | None = None,
-        month: int | None = None,
-        day: int | None = None,
+        country: Union[str, None] = None,
+        year: Union[int, None] = None,
+        month: Union[int, None] = None,
+        day: Union[int, None] = None,
     ) -> Response:
         """If the given day is a holiday return the name or names."""
         holidays = HolidayTable()

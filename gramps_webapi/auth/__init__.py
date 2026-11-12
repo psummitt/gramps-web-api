@@ -590,7 +590,7 @@ def delete_user_push_subscription(
 
 
 def get_all_user_details(
-    tree: str | None,
+    tree: Union[str, None],
     all_trees: bool = False,
     include_treeless=False,
     include_guid: bool = False,
@@ -622,12 +622,12 @@ def get_all_user_details(
 
 
 def get_user_details_page(
-    tree: str | None,
+    tree: Union[str, None],
     all_trees: bool = False,
     include_treeless: bool = False,
-    user_id: uuid.UUID | None = None,
-    roles: Sequence[int] | None = None,
-    page: int | None = None,
+    user_id: Union[uuid.UUID, None] = None,
+    roles: Union[Sequence[int], None] = None,
+    page: Union[int, None] = None,
     pagesize: int = 20,
     include_guid: bool = False,
     include_oidc_accounts: bool = False,
@@ -658,7 +658,7 @@ def get_user_details_page(
     return details, total_count
 
 
-def _get_users_query(tree: str | None, all_trees: bool, include_treeless: bool):
+def _get_users_query(tree: Union[str, None], all_trees: bool, include_treeless: bool):
     """Return a query for the users in scope, see get_all_user_details()."""
     query = user_db.session.query(User)  # pylint: disable=no-member
     if not all_trees:
@@ -673,7 +673,7 @@ def _get_users_query(tree: str | None, all_trees: bool, include_treeless: bool):
     return query
 
 
-def get_permissions(username: str, tree: str | None) -> Set[str]:
+def get_permissions(username: str, tree: Union[str, None]) -> Set[str]:
     """Get the permissions of a given user.
 
     `tree` can be None for site admins, who are not tied to a tree.
@@ -741,7 +741,7 @@ def config_get(key: str) -> Optional[str]:
     return config.value
 
 
-def config_get_all() -> Dict[str, str | None]:
+def config_get_all() -> Dict[str, Union[str, None]]:
     """Get all config items as dictionary."""
     query = user_db.session.query(Config)  # pylint: disable=no-member
     configs = query.all()
@@ -771,7 +771,7 @@ def config_delete(key: str) -> None:
         user_db.session.commit()  # pylint: disable=no-member
 
 
-def get_tree_usage(tree: str) -> Optional[dict[str, int | None]]:
+def get_tree_usage(tree: str) -> Optional[dict[str, Union[int, None]]]:
     """Get tree usage info."""
     query = user_db.session.query(Tree)  # pylint: disable=no-member
     tree_obj: Tree = query.filter_by(id=tree).scalar()
@@ -787,7 +787,7 @@ def get_tree_usage(tree: str) -> Optional[dict[str, int | None]]:
     }
 
 
-def get_tree_permissions(tree: str) -> Optional[dict[str, int | None]]:
+def get_tree_permissions(tree: str) -> Optional[dict[str, Union[int, None]]]:
     """Get tree permissions."""
     query = user_db.session.query(Tree)  # pylint: disable=no-member
     tree_obj: Tree = query.filter_by(id=tree).scalar()
@@ -981,12 +981,12 @@ class User(user_db.Model):  # type: ignore
 
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True)
     name: Mapped[str] = mapped_column(sa.String, unique=True, nullable=False)
-    email: Mapped[str | None] = mapped_column(sa.String, index=True)
-    fullname: Mapped[str | None] = mapped_column(sa.String)
+    email: Mapped[Union[str, None]] = mapped_column(sa.String, index=True)
+    fullname: Mapped[Union[str, None]] = mapped_column(sa.String)
     pwhash: Mapped[str] = mapped_column(sa.String, nullable=False)
     # nullable in the schema, but always set via the default
     role: Mapped[int] = mapped_column(sa.Integer, nullable=True, default=0)
-    tree: Mapped[str | None] = mapped_column(sa.String, index=True)
+    tree: Mapped[Union[str, None]] = mapped_column(sa.String, index=True)
     # copied into refresh tokens; increasing it makes all existing ones invalid
     token_version: Mapped[int] = mapped_column(
         sa.Integer, nullable=False, default=0, server_default="0"
@@ -1007,14 +1007,14 @@ class AccessToken(user_db.Model):  # type: ignore
         GUID, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     scope: Mapped[str] = mapped_column(sa.String(64), nullable=False, index=True)
-    token_hash: Mapped[str | None] = mapped_column(sa.String(64), nullable=True)
+    token_hash: Mapped[Union[str, None]] = mapped_column(sa.String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.DateTime, nullable=False, server_default=sa.func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
         sa.DateTime, nullable=False, server_default=sa.func.now()
     )
-    revoked_at: Mapped[datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    revoked_at: Mapped[Union[datetime, None]] = mapped_column(sa.DateTime, nullable=True)
     # empty for scopes with a single token per user
     label: Mapped[str] = mapped_column(
         sa.String(ACCESS_TOKEN_LABEL_MAX_LENGTH),
@@ -1022,7 +1022,7 @@ class AccessToken(user_db.Model):  # type: ignore
         default="",
         server_default="",
     )
-    last_used_at: Mapped[datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    last_used_at: Mapped[Union[datetime, None]] = mapped_column(sa.DateTime, nullable=True)
 
     __table_args__ = (
         sa.UniqueConstraint(
@@ -1070,7 +1070,7 @@ class Config(user_db.Model):  # type: ignore
 
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     key: Mapped[str] = mapped_column(sa.String, unique=True, nullable=False)
-    value: Mapped[str | None] = mapped_column(sa.String)
+    value: Mapped[Union[str, None]] = mapped_column(sa.String)
 
     def __repr__(self):
         """Return string representation of instance."""
@@ -1083,17 +1083,17 @@ class Tree(user_db.Model):  # type: ignore
     __tablename__ = "trees"
 
     id: Mapped[str] = mapped_column(sa.String, primary_key=True)
-    quota_media: Mapped[int | None] = mapped_column(sa.BigInteger)
-    quota_people: Mapped[int | None] = mapped_column(sa.Integer)
-    quota_ai: Mapped[int | None] = mapped_column(sa.Integer)
-    usage_media: Mapped[int | None] = mapped_column(sa.BigInteger)
-    usage_people: Mapped[int | None] = mapped_column(sa.Integer)
-    usage_ai: Mapped[int | None] = mapped_column(sa.Integer)
-    min_role_ai: Mapped[int | None] = mapped_column(sa.Integer)
-    enabled: Mapped[int | None] = mapped_column(
+    quota_media: Mapped[Union[int, None]] = mapped_column(sa.BigInteger)
+    quota_people: Mapped[Union[int, None]] = mapped_column(sa.Integer)
+    quota_ai: Mapped[Union[int, None]] = mapped_column(sa.Integer)
+    usage_media: Mapped[Union[int, None]] = mapped_column(sa.BigInteger)
+    usage_people: Mapped[Union[int, None]] = mapped_column(sa.Integer)
+    usage_ai: Mapped[Union[int, None]] = mapped_column(sa.Integer)
+    min_role_ai: Mapped[Union[int, None]] = mapped_column(sa.Integer)
+    enabled: Mapped[Union[int, None]] = mapped_column(
         sa.Integer, default=1, server_default="1"
     )
-    config: Mapped[dict | None] = mapped_column(sa.JSON, nullable=True)
+    config: Mapped[Union[dict, None]] = mapped_column(sa.JSON, nullable=True)
 
     def __repr__(self):
         """Return string representation of instance."""
@@ -1111,7 +1111,7 @@ class OIDCAccount(user_db.Model):  # type: ignore
     )
     provider_id: Mapped[str] = mapped_column(sa.String(64), nullable=False)
     subject_id: Mapped[str] = mapped_column(sa.String(255), nullable=False)
-    email: Mapped[str | None] = mapped_column(sa.String(255), nullable=True, index=True)
+    email: Mapped[Union[str, None]] = mapped_column(sa.String(255), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.DateTime, nullable=False, server_default=sa.func.now()
     )
@@ -1139,8 +1139,8 @@ class TaskTree(user_db.Model):  # type: ignore
     __tablename__ = "task_tree"
 
     task_id: Mapped[str] = mapped_column(sa.String(155), primary_key=True)
-    tree: Mapped[str | None] = mapped_column(sa.String, index=True)
-    user_id: Mapped[str | None] = mapped_column(sa.String, index=True)
+    tree: Mapped[Union[str, None]] = mapped_column(sa.String, index=True)
+    user_id: Mapped[Union[str, None]] = mapped_column(sa.String, index=True)
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         sa.DateTime, nullable=False, server_default=sa.func.now()
@@ -1150,15 +1150,15 @@ class TaskTree(user_db.Model):  # type: ignore
     status: Mapped[str] = mapped_column(
         sa.String(16), nullable=False, server_default="unknown"
     )
-    lock_key: Mapped[str | None] = mapped_column(sa.String(64))
+    lock_key: Mapped[Union[str, None]] = mapped_column(sa.String(64))
     rerun: Mapped[bool] = mapped_column(
         sa.Boolean, nullable=False, server_default=sa.false()
     )
-    started_at: Mapped[datetime | None] = mapped_column(sa.DateTime)
-    finished_at: Mapped[datetime | None] = mapped_column(sa.DateTime)
-    heartbeat_at: Mapped[datetime | None] = mapped_column(sa.DateTime)
+    started_at: Mapped[Union[datetime, None]] = mapped_column(sa.DateTime)
+    finished_at: Mapped[Union[datetime, None]] = mapped_column(sa.DateTime)
+    heartbeat_at: Mapped[Union[datetime, None]] = mapped_column(sa.DateTime)
     # JSON: progress while running, return value or error payload when done
-    result: Mapped[str | None] = mapped_column(sa.Text)
+    result: Mapped[Union[str, None]] = mapped_column(sa.Text)
 
     __table_args__ = (
         sa.UniqueConstraint("tree", "lock_key", name="uq_task_tree_tree_lock_key"),

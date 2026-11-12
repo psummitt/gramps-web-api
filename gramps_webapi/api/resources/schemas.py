@@ -1,3 +1,4 @@
+from typing import Union
 """Response schemas for the Gramps Web API.
 
 Each class defines the shape of a response object and is used exclusively for
@@ -58,7 +59,7 @@ def validate_push_endpoint(value: str) -> str:
     return value
 
 
-def push_key_validator(expected_bytes: int, prefix: bytes | None = None):
+def push_key_validator(expected_bytes: int, prefix: Union[bytes, None] = None):
     """Return a validator for a URL-safe base64 Web Push key."""
 
     def validate_key(value: str) -> str:

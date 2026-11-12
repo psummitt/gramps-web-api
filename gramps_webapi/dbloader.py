@@ -23,6 +23,7 @@
 """Database loader utilitis derived from `grampscli`."""
 
 from __future__ import annotations
+from typing import Union
 
 import logging
 import os
@@ -156,7 +157,7 @@ def get_postgres_credentials(directory, username, password):
 
 
 def register_plugins(
-    dbstate: DbState | None = None, uistate=None, rescan: bool = False
+    dbstate: Union[DbState, None] = None, uistate=None, rescan: bool = False
 ) -> None:
     """Register the plugins once per process.
 
@@ -180,7 +181,7 @@ def register_plugins(
 class WebDbSessionManager:
     """Session manager derived from `CLIDbLoader` and `CLIManager`."""
 
-    def __init__(self, dbstate: DbState, user: UserBase, user_id: str | None):
+    def __init__(self, dbstate: DbState, user: UserBase, user_id: Union[str, None]):
         """Initialize self."""
         self.dbstate = dbstate
         self.user = user
@@ -190,10 +191,10 @@ class WebDbSessionManager:
         self,
         filename,
         mode: str,
-        username: str | None,
-        password: str | None,
+        username: Union[str, None],
+        password: Union[str, None],
         force_schema_upgrade: bool = False,
-        dbid: str | None = None,
+        dbid: Union[str, None] = None,
     ):
         """Open a database from a file.
 
@@ -264,8 +265,8 @@ class WebDbSessionManager:
         username=None,
         password=None,
         ignore_lock: bool = False,
-        title: str | None = None,
-        dbid: str | None = None,
+        title: Union[str, None] = None,
+        dbid: Union[str, None] = None,
     ):
         """Open and make a family tree active.
 

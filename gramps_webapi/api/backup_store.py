@@ -26,6 +26,7 @@ import re
 import uuid
 from pathlib import Path
 from typing import Any
+from typing import Union
 
 from flask import current_app
 
@@ -59,7 +60,7 @@ class LocalBackupStore:
         backup_id = str(uuid.uuid4())
         return backup_id, str(tree_dir / f"{backup_id}{BACKUP_EXTENSION}")
 
-    def get_path(self, tree: str, backup_id: str) -> str | None:
+    def get_path(self, tree: str, backup_id: str) -> Union[str, None]:
         """Return the path of an archive of the tree, or None if there is none."""
         if not BACKUP_ID_PATTERN.fullmatch(backup_id):
             return None

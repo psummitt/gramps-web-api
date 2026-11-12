@@ -38,6 +38,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
+from typing import Union
 
 from flask import current_app
 from gramps.gen.const import ENV
@@ -96,7 +97,7 @@ def write_backup(
     tree: str,
     tree_name: str,
     file_path: str,
-    user: UserBase | None = None,
+    user: Union[UserBase, None] = None,
 ) -> dict[str, Any]:
     """Write a backup archive of the tree to `file_path` and return its manifest.
 
@@ -164,7 +165,7 @@ def write_backup(
     return manifest
 
 
-def _export_xml(db_handle: DbReadBase, file_path: str, user: UserBase | None) -> None:
+def _export_xml(db_handle: DbReadBase, file_path: str, user: Union[UserBase, None]) -> None:
     """Export the whole database, unfiltered, as gzipped Gramps XML."""
     plugin_manager = BasePluginManager.get_instance()
     for plugin in plugin_manager.get_export_plugins():

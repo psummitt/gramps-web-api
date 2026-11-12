@@ -28,6 +28,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from time import time_ns
 from typing import Any
+from typing import Union
 
 import gramps
 import orjson
@@ -305,11 +306,11 @@ class DbUndoSQL(DbUndo):
         self,
         grampsdb: DbWriteBase,
         dburl: str,
-        tree_id: int | None = None,
-        user_id: str | None = None,
+        tree_id: Union[int, None] = None,
+        user_id: Union[str, None] = None,
     ) -> None:
         DbUndo.__init__(self, grampsdb)
-        self._connection_id: int | None = None
+        self._connection_id: Union[int, None] = None
         self._schema_initialized = False
         self.tree_id = tree_id
         self.user_id = user_id
@@ -318,7 +319,7 @@ class DbUndoSQL(DbUndo):
         # the undo DB is not notified when a transaction is aborted
         self._pending: dict[int, dict[str, Any]] = {}
         # highest change ID of this connection, once known
-        self._last_id: int | None = None
+        self._last_id: Union[int, None] = None
         # verify pooled connections on checkout, as idle ones can be dropped
         # server-side between operations on this engine
         self.engine = create_engine(dburl, pool_pre_ping=True)
@@ -690,10 +691,10 @@ class DbUndoSQLWeb(DbUndoSQL):
     def _transactions_query(
         self,
         session: Session,
-        before: float | None = None,
-        after: float | None = None,
-        before_id: int | None = None,
-        after_id: int | None = None,
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
+        before_id: Union[int, None] = None,
+        after_id: Union[int, None] = None,
     ):
         """Build the base query for this tree's transactions."""
         query = (
@@ -713,11 +714,11 @@ class DbUndoSQLWeb(DbUndoSQL):
 
     def get_transactions_state(
         self,
-        before: float | None = None,
-        after: float | None = None,
-        before_id: int | None = None,
-        after_id: int | None = None,
-    ) -> tuple[int | None, int]:
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
+        before_id: Union[int, None] = None,
+        after_id: Union[int, None] = None,
+    ) -> tuple[Union[int, None], int]:
         """Get the highest transaction ID and the number of transactions.
 
         Transactions are append-only and immutable, so this pair changes
@@ -742,11 +743,11 @@ class DbUndoSQLWeb(DbUndoSQL):
         old_data: bool = True,
         new_data: bool = True,
         ascending: bool = True,
-        before: float | None = None,
-        after: float | None = None,
-        before_id: int | None = None,
-        after_id: int | None = None,
-        known_count: int | None = None,
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
+        before_id: Union[int, None] = None,
+        after_id: Union[int, None] = None,
+        known_count: Union[int, None] = None,
     ) -> tuple[list[dict[str, Any]], int]:
         """Get transactions as a JSONifiable list.
 
@@ -780,7 +781,7 @@ class DbUndoSQLWeb(DbUndoSQL):
         transaction_id: int,
         old_data: bool = True,
         new_data: bool = True,
-    ) -> dict[str, Any] | None:
+    ) -> Union[dict[str, Any], None]:
         """Get a single transaction as a JSONifiable dict."""
         with self.session_scope() as session:
             transaction = (
@@ -799,8 +800,8 @@ class DbUndoSQLWeb(DbUndoSQL):
         session: Session,
         obj_class: str,
         obj_handle: str,
-        before: float | None = None,
-        after: float | None = None,
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
     ):
         """Build the base query for a single object's changes in this tree.
 
@@ -823,9 +824,9 @@ class DbUndoSQLWeb(DbUndoSQL):
         self,
         obj_class: str,
         obj_handle: str,
-        before: float | None = None,
-        after: float | None = None,
-    ) -> tuple[int | None, int]:
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
+    ) -> tuple[Union[int, None], int]:
         """Get the latest change timestamp and count for a single object.
 
         Changes are append-only and immutable, so this pair changes whenever
@@ -848,9 +849,9 @@ class DbUndoSQLWeb(DbUndoSQL):
         old_data: bool = True,
         new_data: bool = True,
         ascending: bool = True,
-        before: float | None = None,
-        after: float | None = None,
-        known_count: int | None = None,
+        before: Union[float, None] = None,
+        after: Union[float, None] = None,
+        known_count: Union[int, None] = None,
     ) -> tuple[list[dict[str, Any]], int]:
         """Get a single object's own change history as a JSONifiable list.
 

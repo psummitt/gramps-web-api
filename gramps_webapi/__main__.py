@@ -21,6 +21,7 @@
 """Command line interface for the Gramps web API."""
 
 from __future__ import annotations
+from typing import Union
 
 import logging
 import os
@@ -270,7 +271,7 @@ def progress_callback_count_factory(app) -> ProgressCallback:
     """Create a progress callback function that logs progress to the app logger."""
 
     def progress_callback_count(
-        current: int, total: int, prev: int | None = None
+        current: int, total: int, prev: Union[int, None] = None
     ) -> None:
         if total == 0:
             return

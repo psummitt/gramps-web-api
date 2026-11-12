@@ -22,6 +22,7 @@
 import json
 from http import HTTPStatus
 from typing import Any, Dict, NamedTuple, Optional
+from typing import Union
 
 from celery.result import AsyncResult
 from flask import abort
@@ -201,7 +202,7 @@ def _task_meta(task: AsyncResult) -> TaskMeta:
     return TaskMeta(state, result if payload is None else payload)
 
 
-def _row_meta(row: TaskTree | None, task_id: str) -> TaskMeta:
+def _row_meta(row: Union[TaskTree, None], task_id: str) -> TaskMeta:
     """Return state and result of a task from its row, in Celery's spelling.
 
     Tasks without a tracked row (dispatched before the lifecycle was tracked

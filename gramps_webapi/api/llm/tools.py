@@ -25,6 +25,7 @@ import json
 from datetime import datetime
 from functools import wraps
 from typing import Any
+from typing import Union
 
 from pydantic_ai import RunContext
 
@@ -99,7 +100,7 @@ def _apply_gramps_filter(
     empty_message: str = "No results found matching the filter criteria.",
     show_relation_with: str = "",
     logic: str = "and",
-    handles: list | None = None,
+    handles: Union[list, None] = None,
 ) -> str:
     """Apply a Gramps filter and return formatted results.
 
@@ -654,7 +655,7 @@ def filter_events(
     # Resolve participant_id to a set of event handles before filtering.
     # MatchesPersonFilter requires a named filter stored in Gramps and cannot
     # accept inline JSON, so we look up the person's events directly instead.
-    participant_handles: list | None = None
+    participant_handles: Union[list, None] = None
     if participant_id:
         logger = get_logger()
         try:
@@ -714,7 +715,7 @@ def _get_object(
     ctx: RunContext[AgentDeps],
     class_name: str,
     gramps_id: str,
-    offset: int | None = None,
+    offset: Union[int, None] = None,
 ) -> str:
     """Fetch and render a single object by its Gramps ID.
 

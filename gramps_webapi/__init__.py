@@ -25,4 +25,22 @@ import os
 # translations and dates; the collation (LC_COLLATE) is left alone.
 os.environ["LANGUAGE"] = "en"
 
+try:
+    import gramps.gen.lib.json_utils  # noqa: F401
+except Exception:  # pragma: no cover - Gramps 5.1.x compatibility
+    import sys
+    import types
+
+    from .compat import json_utils as _json_utils
+
+    _mod = types.ModuleType("gramps.gen.lib.json_utils")
+    _mod.__dict__.update(_json_utils.__dict__)
+    sys.modules["gramps.gen.lib.json_utils"] = _mod
+    try:
+        import gramps.gen.lib as _lib
+
+        _lib.json_utils = _mod
+    except Exception:
+        pass
+
 from ._version import __version__  # noqa: E402

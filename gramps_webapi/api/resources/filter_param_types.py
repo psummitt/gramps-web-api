@@ -34,6 +34,7 @@ from (`_WIDGET_TYPES`); other widgets get type text, marked as custom.
 
 from collections.abc import Callable
 from typing import Any
+from typing import Union
 
 from gramps.gen.filters.rules import Rule
 
@@ -53,7 +54,7 @@ def _filter(namespace: str) -> dict[str, Any]:
     return {"type": "filter", "namespace": namespace}
 
 
-def _integer(minimum: int, maximum: int | None = None) -> dict[str, Any]:
+def _integer(minimum: int, maximum: Union[int, None] = None) -> dict[str, Any]:
     result: dict[str, Any] = {"type": "integer", "min": minimum}
     if maximum is not None:
         result["max"] = maximum
@@ -195,7 +196,7 @@ _WIDGET_TYPES: dict[str, dict[str, Any]] = {
 }
 
 
-def get_label_text(label: str | tuple[str, Callable]) -> str:
+def get_label_text(label: Union[str, tuple[str, Callable]]) -> str:
     """Return the text of a label, which may be a (text, widget_class) pair."""
     if isinstance(label, tuple):
         return label[0]
@@ -219,7 +220,7 @@ def _label_type(label: str, namespace: str) -> dict[str, Any]:
     return _LABEL_TYPES.get(label, TEXT)
 
 
-def _param_type(label: str | tuple[str, Callable], namespace: str) -> dict[str, Any]:
+def _param_type(label: Union[str, tuple[str, Callable]], namespace: str) -> dict[str, Any]:
     """Return the type of a parameter from its label declaration."""
     if isinstance(label, tuple):
         return _widget_type(label[1])

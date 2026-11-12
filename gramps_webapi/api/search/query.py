@@ -36,6 +36,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from typing import Any, Callable, Sequence
+from typing import Union
 
 from gramps.gen.lib import EventType, FamilyRelType, PlaceType, RepositoryType
 from sqlalchemy import TextClause, bindparam, text
@@ -126,7 +127,7 @@ def _terms(part: str, types: TypeNames) -> list[Term]:
     return terms
 
 
-def parse_query(query: str, types: TypeNames | None = None) -> list[Clause]:
+def parse_query(query: str, types: Union[TypeNames, None] = None) -> list[Clause]:
     """Parse a query into clauses (AND) of terms (OR).
 
     `types` are the translated type names of the user's language.
@@ -180,7 +181,7 @@ SORT_COLUMNS = {"change": "o.change", "type": "o.obj_type"}
 EXPANDED_WEIGHT = 0.5
 
 
-def _order_by(sort: Sequence[str] | None, default: str) -> str:
+def _order_by(sort: Union[Sequence[str], None], default: str) -> str:
     keys = []
     for key in sort or []:
         descending = key.startswith("-")
@@ -192,9 +193,9 @@ def _order_by(sort: Sequence[str] | None, default: str) -> str:
 
 def _filters(
     params: dict[str, Any],
-    object_types: Sequence[str] | None,
-    change_op: str | None,
-    change_value: float | None,
+    object_types: Union[Sequence[str], None],
+    change_op: Union[str, None],
+    change_value: Union[float, None],
 ) -> str:
     """Conditions on the hit objects `o`."""
     conditions = []
@@ -221,11 +222,11 @@ def build_search(
     tree: str,
     clauses: Sequence[Clause],
     include_private: bool,
-    object_types: Sequence[str] | None = None,
-    change_op: str | None = None,
-    change_value: float | None = None,
-    sort: Sequence[str] | None = None,
-    limit: int | None = None,
+    object_types: Union[Sequence[str], None] = None,
+    change_op: Union[str, None] = None,
+    change_value: Union[float, None] = None,
+    sort: Union[Sequence[str], None] = None,
+    limit: Union[int, None] = None,
     offset: int = 0,
     count_only: bool = False,
 ) -> tuple[TextClause, dict[str, Any]]:
@@ -322,11 +323,11 @@ def build_search(
 def build_list(
     tree: str,
     include_private: bool,
-    object_types: Sequence[str] | None = None,
-    change_op: str | None = None,
-    change_value: float | None = None,
-    sort: Sequence[str] | None = None,
-    limit: int | None = None,
+    object_types: Union[Sequence[str], None] = None,
+    change_op: Union[str, None] = None,
+    change_value: Union[float, None] = None,
+    sort: Union[Sequence[str], None] = None,
+    limit: Union[int, None] = None,
     offset: int = 0,
     count_only: bool = False,
 ) -> tuple[TextClause, dict[str, Any]]:
@@ -342,7 +343,7 @@ def build_list(
     return _bind(_paginate(sql, params, limit, offset), params), params
 
 
-def _paginate(sql: str, params: dict[str, Any], limit: int | None, offset: int) -> str:
+def _paginate(sql: str, params: dict[str, Any], limit: Union[int, None], offset: int) -> str:
     if limit is None:
         return sql
     params["limit"] = limit

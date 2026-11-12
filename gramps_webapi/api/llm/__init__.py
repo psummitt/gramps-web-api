@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from typing import Any
+from typing import Union
 
 import httpx
 from flask import current_app
@@ -154,9 +155,9 @@ def answer_with_agent(
     tree: str,
     include_private: bool,
     user_id: str,
-    history: list | None = None,
-    progress_callback: Callable[[str, str], None] | None = None,
-    message_history_raw: str | None = None,
+    history: Union[list, None] = None,
+    progress_callback: Union[Callable[[str, str], None], None] = None,
+    message_history_raw: Union[str, None] = None,
 ):
     """Answer a prompt using Pydantic AI agent.
 
@@ -209,7 +210,7 @@ def answer_with_agent(
         progress_callback=progress_callback,
     )
 
-    message_history: list[ModelRequest | ModelResponse] = []
+    message_history: list[Union[ModelRequest, ModelResponse]] = []
     if message_history_raw:
         try:
             message_history = ModelMessagesTypeAdapter.validate_json(

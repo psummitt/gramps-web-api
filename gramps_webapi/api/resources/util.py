@@ -396,7 +396,7 @@ def get_event_participants_for_handle(
     handle: Handle,
     locale: GrampsLocale = glocale,
     backlink_index: Optional[dict[Handle, list[tuple[str, Handle]]]] = None,
-) -> dict[Literal["people", "families"], list[tuple[EventRoleType, Person | Family]]]:
+) -> dict[Literal["people", "families"], list[tuple[EventRoleType, Union[Person, Family]]]]:
     """Get event participants given a handle.
 
     `backlink_index`, if given (see preload_event_backlinks()), is
@@ -406,7 +406,7 @@ def get_event_participants_for_handle(
     would otherwise mean one query per event in the tree.
     """
     result: dict[
-        Literal["people", "families"], list[tuple[EventRoleType, Person | Family]]
+        Literal["people", "families"], list[tuple[EventRoleType, Union[Person, Family]]]
     ] = {
         "people": [],
         "families": [],
@@ -634,7 +634,7 @@ def get_birth_profile(
     person: Person,
     args: Union[list, None] = None,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
+    name_format: Union[str, None] = None,
 ) -> tuple[dict, Union[Event, None]]:
     """Return best available birth information for a person."""
     try:
@@ -658,7 +658,7 @@ def get_death_profile(
     person: Person,
     args: Union[list, None] = None,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
+    name_format: Union[str, None] = None,
 ) -> tuple[dict, Union[Event, None]]:
     """Return best available death information for a person."""
     try:
@@ -682,7 +682,7 @@ def get_marriage_profile(
     family: Family,
     args: Union[list, None] = None,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
+    name_format: Union[str, None] = None,
 ) -> tuple[dict, Union[Event, None]]:
     """Return best available marriage information for a couple."""
     event = get_fallback_event(get_marriage_or_fallback, db_handle, family)
@@ -700,10 +700,10 @@ def get_marriage_profile(
 def get_divorce_profile(
     db_handle: DbReadBase,
     family: Family,
-    args: list | None = None,
+    args: Union[list, None] = None,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
-) -> tuple[dict, Event | None]:
+    name_format: Union[str, None] = None,
+) -> tuple[dict, Union[Event, None]]:
     """Return best available divorce information for a couple."""
     event = get_fallback_event(get_divorce_or_fallback, db_handle, family)
     if event is None:
@@ -724,7 +724,7 @@ def _format_place_type(
     return locale.translation.sgettext(place_type.xml_str())
 
 
-def get_place_coordinates(place: Place) -> tuple[float | None, float | None]:
+def get_place_coordinates(place: Place) -> tuple[Union[float, None], Union[float, None]]:
     """Get a place's latitude and longitude as floats, or None if invalid."""
     latitude, longitude = conv_lat_lon(place.lat, place.long, format="D.D8")
     if latitude and longitude:
@@ -835,7 +835,7 @@ def get_person_profile_for_object(
     person: Person,
     args: list,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
+    name_format: Union[str, None] = None,
     precision: int = 3,
 ) -> dict[str, Any]:
     """Get person profile given a Person."""
@@ -945,7 +945,7 @@ def get_person_profile_for_handle(
     handle: Handle,
     args: list,
     locale: GrampsLocale = glocale,
-    name_format: str | None = None,
+    name_format: Union[str, None] = None,
     precision: int = 3,
 ) -> dict[str, Any]:
     """Get person profile given a handle."""
@@ -1176,7 +1176,7 @@ def get_extended_attributes(
 ) -> dict:
     """Get extended attributes for a GrampsObject."""
     args = args or {}
-    result: dict[str, list | dict[str, Any]] = {}
+    result: dict[str, Union[list, dict[str, Any]]] = {}
     do_all = False
     if "all" in args["extend"]:
         do_all = True
@@ -2043,7 +2043,7 @@ def get_one_relationship(
     )
 
 
-def get_importers(extension: str | None = None):
+def get_importers(extension: Union[str, None] = None):
     """Extract and return list of importers."""
     importers = []
     plugin_manager = BasePluginManager.get_instance()
@@ -2236,7 +2236,7 @@ def run_import(
     for plugin in plugin_manager.get_import_plugins():
         if extension == plugin.get_extension():
             import_function = plugin.get_import_function()
-            user: ImportUser | UserTaskProgress
+            user: Union[ImportUser, UserTaskProgress]
             if task:
                 user = UserTaskProgress(task=task)
             else:
@@ -2298,7 +2298,7 @@ def dry_run_import(
     return result
 
 
-def normalize_etag(etag: str | None) -> str | None:
+def normalize_etag(etag: Union[str, None]) -> Union[str, None]:
     """Normalize an Etag"""
     if not etag:
         return None

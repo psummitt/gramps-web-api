@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import re
 from typing import Any, Callable
+from typing import Union
 
 from gramps.gen.db.base import DbReadBase
 from gramps.gen.errors import HandleError
@@ -336,7 +337,7 @@ def _notes(db_handle: DbReadBase, obj) -> list[str]:
 def _backlinks(
     db_handle: DbReadBase,
     handle: str,
-    include_classes: list[str] | None = None,
+    include_classes: Union[list[str], None] = None,
 ) -> list[tuple[str, Any]]:
     """Return the objects that reference an object."""
     result = []

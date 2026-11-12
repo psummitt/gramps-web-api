@@ -25,6 +25,7 @@ import shutil
 from importlib import metadata
 from importlib.util import find_spec
 from typing import Any
+from typing import Union
 
 import gramps_ql as gql
 import limits
@@ -102,7 +103,7 @@ def _get_thumbnail_support() -> dict[str, bool]:
 
 
 @functools.cache
-def _parse_rate_limit(limit_string: str) -> list[dict[str, int]] | None:
+def _parse_rate_limit(limit_string: str) -> Union[list[dict[str, int]], None]:
     """Parse a rate limit string into structured limits, or None if invalid.
 
     A rate limit string is written in the mini-language of the `limits` library,
@@ -170,7 +171,7 @@ def _get_dbid_from_tree_id(tree_id: str) -> str:
     return get_dbid_from_tree_id(tree_id)
 
 
-def _get_single_tree_backend(is_multi_tree: bool) -> str | None:
+def _get_single_tree_backend(is_multi_tree: bool) -> Union[str, None]:
     """Return the DB backend ID of the tree in single-tree mode, else None."""
     if is_multi_tree:
         return None

@@ -144,8 +144,8 @@ def _purge_expired_task_rows() -> None:
 
 
 def _acquire(
-    task_id: str, task: Task, lock_key: str | None, kwargs: dict
-) -> str | None:
+    task_id: str, task: Task, lock_key: Union[str, None], kwargs: dict
+) -> Union[str, None]:
     """Record the task, aborting with 409 if its lock is held by another task.
 
     Returns the ID of the active task a coalesced dispatch was folded into.
@@ -314,7 +314,7 @@ def progress_callback_count(title: str = "", message: str = "") -> Callable:
     """
     report = progress_reporter()
 
-    def callback(current: int, total: int, prev: int | None = None) -> None:
+    def callback(current: int, total: int, prev: Union[int, None] = None) -> None:
         if total == 0:
             return
         pct = int(100 * current / total)
@@ -521,7 +521,7 @@ def _reset_tree(
     extension: str,
     dry_run: bool,
     check_media: bool = False,
-) -> tuple[dict[str, dict[str, int]], list[str] | None]:
+) -> tuple[dict[str, dict[str, int]], Union[list[str], None]]:
     """Reset a tree to the state of a backup file, see `restore_backup`.
 
     Returns the changeset summary and, with `check_media`, the Gramps IDs of
@@ -652,7 +652,7 @@ def restore_backup_archive(
 @shared_task(bind=True)
 def export_db(
     self, tree: str, user_id: str, extension: str, options: Dict, view_private: bool
-) -> dict[str, str | list[str]]:
+) -> dict[str, Union[str, list[str]]]:
     """Export a database."""
     db_handle = get_db_outside_request(
         tree=tree, view_private=view_private, readonly=True, user_id=user_id
@@ -710,7 +710,7 @@ def generate_report(
 
 @shared_task(bind=True)
 def export_media(
-    self, tree: str, user_id: str, view_private: bool, file_name: str | None = None
+    self, tree: str, user_id: str, view_private: bool, file_name: Union[str, None] = None
 ) -> Dict[str, Union[str, int]]:
     """Export media files to an archive named `file_name`.
 
@@ -1128,9 +1128,9 @@ def process_chat(
     user_id: str,
     query: str,
     include_private: bool,
-    history: list | None = None,
+    history: Union[list, None] = None,
     verbose: bool = False,
-    message_history_raw: str | None = None,
+    message_history_raw: Union[str, None] = None,
 ) -> dict[str, Any]:
     """Process a chat query with the AI agent."""
     # import here to avoid error if AI dependencies are not installed

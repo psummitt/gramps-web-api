@@ -33,6 +33,7 @@ from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
 from http import HTTPStatus
 from typing import Any, BinaryIO, Iterator, NoReturn, Optional, Sequence
+from typing import Union
 
 import gramps.gen.lib
 from celery import Task
@@ -139,8 +140,8 @@ class ErrorRaisingMixin:
     layout ends up neither in the response nor in the logs.
     """
 
-    hidden_dir: str | None = None
-    error_messages: list[str] | None = None
+    hidden_dir: Union[str, None] = None
+    error_messages: Union[list[str], None] = None
 
     def notify_error(self, title: str, error: str = "") -> None:
         """Notify the user of an error."""
@@ -242,7 +243,7 @@ class UserTaskProgress(ErrorRaisingMixin, InfoCollectorMixin, UserBase):
         """Warn the user."""
 
 
-def get_db_manager(tree: str | None) -> WebDbManager:
+def get_db_manager(tree: Union[str, None]) -> WebDbManager:
     """Get an appropriate WebDbManager instance."""
     return WebDbManager(
         dirname=tree,
@@ -253,7 +254,7 @@ def get_db_manager(tree: str | None) -> WebDbManager:
     )
 
 
-def get_tree_from_jwt() -> str | None:
+def get_tree_from_jwt() -> Union[str, None]:
     """Get the tree ID from the token.
 
     Needs request context. Can return None if no tree ID is present,
@@ -423,7 +424,7 @@ def get_buffer_for_file(filename: str, delete=True, not_found=False) -> BinaryIO
 
 
 def _resolve_smtp_config(
-    use_ssl: bool | None, use_starttls: bool | None, use_tls: bool | None, port: int
+    use_ssl: Union[bool, None], use_starttls: Union[bool, None], use_tls: Union[bool, None], port: int
 ) -> tuple[bool, bool]:
     """Helper to resolve SMTP encryption settings.
 
@@ -446,8 +447,8 @@ def send_email(
     subject: str,
     body: str,
     to: Sequence[str],
-    from_email: str | None = None,
-    body_html: str | None = None,
+    from_email: Union[str, None] = None,
+    body_html: Union[str, None] = None,
 ) -> None:
     """Send an e-mail message."""
     msg = EmailMessage()
@@ -474,7 +475,7 @@ def send_email(
     use_ssl, use_starttls = _resolve_smtp_config(use_ssl, use_starttls, use_tls, port)
 
     try:
-        smtp: smtplib.SMTP | smtplib.SMTP_SSL
+        smtp: Union[smtplib.SMTP, smtplib.SMTP_SSL]
         if use_ssl:
             smtp = smtplib.SMTP_SSL(host=host, port=port, timeout=10)
             smtp.ehlo()
@@ -522,7 +523,7 @@ def list_trees() -> list[tuple[str, str]]:
     return dbman.current_names
 
 
-def get_tree_id_or_none(guid: str) -> str | None:
+def get_tree_id_or_none(guid: str) -> Union[str, None]:
     """Get the appropriate tree ID for a user, if any.
 
     Returns None if multi-tree support is enabled and the user has no tree ID.
@@ -573,7 +574,7 @@ def tree_exists(tree_id: str) -> bool:
     return True
 
 
-def update_usage_people(tree: str | None = None, user_id: str | None = None) -> int:
+def update_usage_people(tree: Union[str, None] = None, user_id: Union[str, None] = None) -> int:
     """Update the usage of people."""
     if not tree:
         tree = get_tree_from_jwt_or_fail()
@@ -595,7 +596,7 @@ def update_usage_people(tree: str | None = None, user_id: str | None = None) -> 
 
 
 def check_quota_people(
-    to_add: int, tree: str | None = None, user_id: str | None = None
+    to_add: int, tree: Union[str, None] = None, user_id: Union[str, None] = None
 ) -> None:
     """Check whether the quota allows adding `to_add` people and abort if not."""
     if not tree:
@@ -616,7 +617,7 @@ def check_quota_people(
         abort_with_message(405, "Not allowed by people quota")
 
 
-def update_usage_ai(new: int, tree: str | None = None) -> int:
+def update_usage_ai(new: int, tree: Union[str, None] = None) -> int:
     """Update the usage of AI by adding `new` units to the usage."""
     if not tree:
         tree = get_tree_from_jwt_or_fail()
@@ -630,7 +631,7 @@ def update_usage_ai(new: int, tree: str | None = None) -> int:
     return new_usage
 
 
-def check_quota_ai(requested: int, tree: str | None = None) -> None:
+def check_quota_ai(requested: int, tree: Union[str, None] = None) -> None:
     """Check whether the AI quota allows consuming another `requested` units."""
     if not tree:
         tree = get_tree_from_jwt_or_fail()
@@ -663,8 +664,8 @@ def remove_file_on_error(file_path: str) -> Iterator[None]:
 def abort_with_message(
     status: int,
     message: str,
-    error_type: str | None = None,
-    extra: dict[str, Any] | None = None,
+    error_type: Union[str, None] = None,
+    extra: Union[dict[str, Any], None] = None,
 ) -> NoReturn:
     """Abort with a JSON response, adding ``extra`` to the error body."""
     error_body: dict[str, Any] = {"code": status, "message": message}
@@ -682,7 +683,7 @@ def abort_with_message(
     raise exc
 
 
-def upgrade_gramps_database(tree: str, user_id: str, task: Task | None = None) -> None:
+def upgrade_gramps_database(tree: str, user_id: str, task: Union[Task, None] = None) -> None:
     """Upgrade the Gramps database for a tree."""
     dbmgr = get_db_manager(tree=tree)
     dbmgr.upgrade_if_needed(user_id=user_id, user=UserTaskProgress(task=task))
@@ -708,13 +709,13 @@ def get_total_number_of_objects(db_handle: DbReadBase):
 
 def get_object_timestamps(
     db_handle: DbReadBase,
-) -> dict[str, set[tuple[str, float | int]]]:
+) -> dict[str, set[tuple[str, Union[float, int]]]]:
     """Get change timestamps of all objects in the DB.
 
     Returns a dictionary keyed by class name with sets of (handle, change
     timestamp) tuples.
     """
-    d: dict[str, set[tuple[str, float | int]]] = {}
+    d: dict[str, set[tuple[str, Union[float, int]]]] = {}
     for class_name in PRIMARY_GRAMPS_OBJECTS:
         d[class_name] = set()
         iter_method = db_handle.method("iter_%s_handles", class_name)

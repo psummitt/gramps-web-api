@@ -7,6 +7,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Literal, Sequence, overload
+from typing import Union
 
 from gramps_webapi.types import MatchSegment
 
@@ -23,9 +24,9 @@ class SegmentColumnOrder:
     start_position: int
     end_position: int
     centimorgans: int
-    num_snps: int | None = None
-    side: int | None = None
-    comment: int | None = None
+    num_snps: Union[int, None] = None
+    side: Union[int, None] = None
+    comment: Union[int, None] = None
 
 
 def get_delimiter(rows: list[str]) -> str:
@@ -116,7 +117,7 @@ def find_column_position(
     condition: Callable[[str], bool],
     exclude_indices: Sequence[int],
     allow_missing: Literal[True],
-) -> int | None: ...
+) -> Union[int, None]: ...
 
 
 def find_column_position(
@@ -124,7 +125,7 @@ def find_column_position(
     condition: Callable[[str], bool],
     exclude_indices: Sequence[int],
     allow_missing: bool = False,
-) -> int | None:
+) -> Union[int, None]:
     """Find the position of a column in a list of column names or raise a ValueError."""
     for i, column in enumerate(column_names):
         if i in exclude_indices:
@@ -137,7 +138,7 @@ def find_column_position(
 
 
 def get_order(
-    header: list[str] | None, data_columns: Sequence[Sequence[str | None]]
+    header: Union[list[str], None], data_columns: Sequence[Sequence[Union[str, None]]]
 ) -> SegmentColumnOrder:
     """Get the order of the columns."""
     if header is None:
@@ -231,8 +232,8 @@ def get_order(
 
 
 def transpose_jagged_nested_list(
-    data: Sequence[Sequence[str | None]],
-) -> list[list[str | None]]:
+    data: Sequence[Sequence[Union[str, None]]],
+) -> list[list[Union[str, None]]]:
     """Transpose a jagged nested list, replacing missing values with None."""
     return list(map(list, itertools.zip_longest(*data, fillvalue=None)))
 
@@ -244,7 +245,7 @@ def parse_raw_dna_match_string(raw_string: str) -> list[MatchSegment]:
         delimiter = get_delimiter(rows)
     except ValueError:
         return []
-    header: list[str] | None
+    header: Union[list[str], None]
     if has_header(rows, delimiter):
         header = rows[0].split(delimiter)
         rows = rows[1:]
@@ -269,7 +270,7 @@ def parse_raw_dna_match_string(raw_string: str) -> list[MatchSegment]:
     return segments
 
 
-def process_row(fields: list[str], order: SegmentColumnOrder) -> MatchSegment | None:
+def process_row(fields: list[str], order: SegmentColumnOrder) -> Union[MatchSegment, None]:
     """Process a row of a DNA match table."""
     if len(fields) < 4:
         return None

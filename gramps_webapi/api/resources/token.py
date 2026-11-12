@@ -20,6 +20,7 @@
 """Authentication endpoint blueprint."""
 
 from typing import Any, Iterable
+from typing import Union
 
 from flask import abort, current_app
 from flask_jwt_extended import (
@@ -63,7 +64,7 @@ from .access_tokens import get_active_user_from_access_token
 
 def get_tree_id_and_permissions(
     user_id: str, username: str
-) -> tuple[str | None, set[str]]:
+) -> tuple[Union[str, None], set[str]]:
     """Resolve the tree ID and permissions of a user logging in.
 
     A user without a tree only gets a token if they are a site admin, who is
@@ -85,10 +86,10 @@ def get_tree_id_and_permissions(
 def get_tokens(
     user_id: str,
     permissions: Iterable[str],
-    tree_id: str | None,
+    tree_id: Union[str, None],
     include_refresh: bool = False,
     fresh: bool = False,
-    oidc_provider: str | None = None,
+    oidc_provider: Union[str, None] = None,
 ):
     """Create access token (and refresh token if desired)."""
     claims: dict[str, Any] = {"permissions": list(permissions)}
@@ -112,7 +113,7 @@ def get_tokens(
 
 
 def issue_access_token(
-    user_id: str, scope: str | None = None, token_version: int | None = None
+    user_id: str, scope: Union[str, None] = None, token_version: Union[int, None] = None
 ) -> dict[str, str]:
     """Create a non-fresh access token, without a refresh token, for a user.
 

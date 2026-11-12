@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import Union
 
 from flask import abort
 from gramps.gen.const import GRAMPS_LOCALE as glocale
@@ -80,7 +81,7 @@ class PersonDnaMatchesResource(ProtectedResource):
         db_handle = CachePeopleFamiliesProxy(get_db_handle())
 
         try:
-            person: Person | None = db_handle.get_person_from_handle(handle)
+            person: Union[Person, None] = db_handle.get_person_from_handle(handle)
         except HandleError:
             abort(404)
         if person is None:
@@ -132,7 +133,7 @@ def get_match_data(
     association_index: int,
     locale: GrampsLocale = glocale,
     include_raw_data: bool = False,
-) -> dict[str, Any] | None:
+) -> Union[dict[str, Any], None]:
     """Get the DNA match data in the appropriate format.
 
     Return None if the associated person is missing or not available.
@@ -213,7 +214,7 @@ def get_match_data(
     if include_raw_data:
         raw_data = []
         for note_handle in note_handles_with_segments:
-            note: Note | None = get_object_or_none(db_handle, "Note", note_handle)
+            note: Union[Note, None] = get_object_or_none(db_handle, "Note", note_handle)
             if note is not None:
                 raw_data.append(note.get())
         result["raw_data"] = raw_data
@@ -250,12 +251,12 @@ def is_x_chromosome(chromosome: object) -> bool:
 def get_segments_from_note(
     db_handle: DbReadBase,
     handle: Handle,
-    side: str | None = None,
-    side_x: str | None = None,
+    side: Union[str, None] = None,
+    side_x: Union[str, None] = None,
 ) -> list[MatchSegment]:
     """Get the segements from a note handle."""
     try:
-        note: Note | None = db_handle.get_note_from_handle(handle)
+        note: Union[Note, None] = db_handle.get_note_from_handle(handle)
     except HandleError:
         return []
     if note is None:
@@ -267,7 +268,7 @@ def get_segments_from_note(
 
 
 def parse_raw_match_string_with_default_side(
-    raw_string: str, side: str | None = None, side_x: str | None = None
+    raw_string: str, side: Union[str, None] = None, side_x: Union[str, None] = None
 ) -> list[MatchSegment]:
     """Parse a raw DNA match string and return a list of segments.
 

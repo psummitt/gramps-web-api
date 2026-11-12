@@ -20,6 +20,7 @@
 """Y-DNA resources."""
 
 from __future__ import annotations
+from typing import Union
 from dataclasses import asdict
 
 from marshmallow import Schema
@@ -67,7 +68,7 @@ class PersonYDnaResource(ProtectedResource):
         """
         db_handle = get_db_handle()
         try:
-            person: Person | None = db_handle.get_person_from_handle(handle)
+            person: Union[Person, None] = db_handle.get_person_from_handle(handle)
         except HandleError:
             abort_with_message(404, "Person not found")
         if person is None:

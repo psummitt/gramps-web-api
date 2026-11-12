@@ -49,7 +49,7 @@ from .image import (
 from .util import abort_with_message
 
 
-def _get_map_bounds(media) -> list | None:
+def _get_map_bounds(media) -> Union[list, None]:
     """Return [[lat_min, lon_min], [lat_max, lon_max]] from the map:bounds attribute, or None."""
     for attr in media.attribute_list:
         if str(attr.get_type()) == "map:bounds":
@@ -124,7 +124,7 @@ class FileHandler:
         """Send thumbnail of cropped image."""
         raise NotImplementedError
 
-    def send_map_tile(self, z: int, x: int, y: int, max_zoom: int | None = None):
+    def send_map_tile(self, z: int, x: int, y: int, max_zoom: Union[int, None] = None):
         """Send a map tile for a georeferenced image."""
         raise NotImplementedError
 
@@ -296,7 +296,7 @@ class LocalFileHandler(FileHandler):
         )
         return send_file(buffer, mimetype=MIME_AVIF)
 
-    def send_map_tile(self, z: int, x: int, y: int, max_zoom: int | None = None):
+    def send_map_tile(self, z: int, x: int, y: int, max_zoom: Union[int, None] = None):
         """Send a map tile for a georeferenced image."""
         if max_zoom is not None and z > max_zoom:
             return send_file(transparent_png_tile(), mimetype=MIME_PNG)

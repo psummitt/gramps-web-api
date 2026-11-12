@@ -25,6 +25,7 @@ import os
 import re
 import uuid
 from typing import Dict, List, Optional
+from typing import Union
 
 from flask import abort, current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity
@@ -77,7 +78,7 @@ from .schemas import TreeConfigSchema, TreeSchema
 TREE_ID_REGEX = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 
-def get_tree_details(tree_id: str) -> Dict[str, str | bool | int | None]:
+def get_tree_details(tree_id: str) -> Dict[str, Union[str, bool, int, None]]:
     """Get details about a tree."""
     try:
         dbmgr = WebDbManager(

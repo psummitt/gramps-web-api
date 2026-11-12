@@ -1,3 +1,4 @@
+from typing import Union
 #
 # Gramps Web API - A RESTful API for the Gramps genealogy program
 #
@@ -102,7 +103,7 @@ OIDC_LINK_CODE_PREFIX = "oidc_link_code:"
 OIDC_LINK_TICKET_TIMEOUT = 120
 
 
-def _get_oidc_client(provider_id: str | None) -> tuple[object, dict]:
+def _get_oidc_client(provider_id: Union[str, None]) -> tuple[object, dict]:
     """Return the authlib client and configuration for a validated provider.
 
     Aborts the request if OIDC is disabled, the provider is unknown, or the
@@ -137,7 +138,7 @@ def _get_oidc_client(provider_id: str | None) -> tuple[object, dict]:
     return oidc_client, provider_config or {}
 
 
-def _validate_tree_id(tree_id: str | None) -> str | None:
+def _validate_tree_id(tree_id: Union[str, None]) -> Union[str, None]:
     """Validate the tree an OIDC login is scoped to.
 
     Mirrors the checks the registration endpoint applies, so that an OIDC login

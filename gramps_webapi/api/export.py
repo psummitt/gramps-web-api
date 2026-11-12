@@ -28,6 +28,7 @@ import os
 import uuid
 from pathlib import Path
 from typing import Callable, Dict, Optional
+from typing import Union
 
 import gramps_gedcom7
 from celery import Task
@@ -203,7 +204,7 @@ class ExportOptions:
         return dbase
 
 
-def get_exporters(extension: str | None = None):
+def get_exporters(extension: Union[str, None] = None):
     """Extract and return list of exporters."""
     exporters = []
     plugin_manager = BasePluginManager.get_instance()
@@ -284,7 +285,7 @@ def run_export(
     extension: str,
     options,
     task: Optional[Task] = None,
-    progress: Callable[[int, int], None] | None = None,
+    progress: Union[Callable[[int, int], None], None] = None,
 ) -> tuple[str, str, list[str]]:
     """Generate the export.
 
@@ -337,7 +338,7 @@ def run_gedcom7_export(
     db_handle: DbReadBase,
     export_path: str,
     options,
-    progress: Callable[[int, int], None] | None = None,
+    progress: Union[Callable[[int, int], None], None] = None,
 ) -> tuple[str, str, list[str]]:
     """Export the database as a GEDCOM 7 file."""
     file_name = f"{uuid.uuid4()}.ged"

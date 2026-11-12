@@ -20,6 +20,7 @@
 """Pydantic AI agent for LLM interactions."""
 
 from __future__ import annotations
+from typing import Union
 
 import warnings
 
@@ -156,8 +157,8 @@ def _has_provider_prefix(model_name: str) -> bool:
 
 def create_agent(
     model_name: str,
-    base_url: str | None = None,
-    system_prompt_override: str | None = None,
+    base_url: Union[str, None] = None,
+    system_prompt_override: Union[str, None] = None,
 ) -> Agent[AgentDeps, str]:
     """Create a Pydantic AI agent with the specified model.
 
@@ -178,7 +179,7 @@ def create_agent(
     # If model name has a provider prefix (e.g., "mistral:model-name"),
     # let Pydantic AI handle provider detection automatically
     if model_name.startswith("ollama:") and base_url:
-        model: str | OpenAIChatModel = OllamaModel(
+        model: Union[str, OpenAIChatModel] = OllamaModel(
             model_name.removeprefix("ollama:"),
             provider=OllamaProvider(base_url=base_url),
         )

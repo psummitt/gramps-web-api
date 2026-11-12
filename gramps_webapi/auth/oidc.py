@@ -23,6 +23,7 @@ import logging
 import secrets
 import uuid
 from typing import Any
+from typing import Union
 
 from authlib.integrations.flask_client import OAuth
 from flask import current_app
@@ -119,7 +120,7 @@ def get_available_oidc_providers(app=None) -> list[str]:
     return providers
 
 
-def get_provider_config(provider_id: str, app=None) -> dict | None:
+def get_provider_config(provider_id: str, app=None) -> Union[dict, None]:
     """Get configuration for a specific OIDC provider.
 
     Args:
@@ -214,7 +215,7 @@ def configure_pkce(client, provider_config: dict) -> bool:
     return enabled
 
 
-def get_role_from_claims(user_claims: dict, role_claim: str = "groups") -> int | None:
+def get_role_from_claims(user_claims: dict, role_claim: str = "groups") -> Union[int, None]:
     """Map OIDC claims to Gramps roles based on environment variables.
 
     Args:
@@ -288,7 +289,7 @@ def get_role_from_claims(user_claims: dict, role_claim: str = "groups") -> int |
     return highest_role
 
 
-def get_usable_email(userinfo: dict) -> str | None:
+def get_usable_email(userinfo: dict) -> Union[str, None]:
     """Return an e-mail address that can safely be stored for this user.
 
     An address the provider explicitly marks as unverified is discarded; a
@@ -308,7 +309,7 @@ def get_usable_email(userinfo: dict) -> str | None:
 
 
 def create_or_update_oidc_user(
-    userinfo: dict, tree_id: str | None, provider_id: str
+    userinfo: dict, tree_id: Union[str, None], provider_id: str
 ) -> str:
     """Create or update a user based on OIDC userinfo using secure sub claim mapping.
 

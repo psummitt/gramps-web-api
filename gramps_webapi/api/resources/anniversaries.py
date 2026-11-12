@@ -17,6 +17,7 @@ from calendar import monthrange
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, cast
+from typing import Union
 
 from flask import Response, request
 from gramps.gen import filters as gramps_filters
@@ -168,7 +169,7 @@ def _fold_ics_line(line: str) -> str:
     return "\r\n".join(parts)
 
 
-def _get_anniversary_date_components(event: Event) -> tuple[int, int, int] | None:
+def _get_anniversary_date_components(event: Event) -> Union[tuple[int, int, int], None]:
     """Return exact Gregorian components; year 0 represents an unknown year."""
     if event.date is None:
         return None
@@ -308,7 +309,7 @@ def _collect_anniversaries(
     person_handles = _apply_selected_filters(db_handle, args, "Person", person_handles)
 
     entries: dict[str, AnniversaryEvent] = {}
-    date_components: dict[str, tuple[int, int, int] | None] = {}
+    date_components: dict[str, Union[tuple[int, int, int], None]] = {}
     living: dict[str, bool] = {}
     people: list[Person] = []
     family_handles: set[str] = set()
@@ -320,13 +321,13 @@ def _collect_anniversaries(
             living[person.handle] = probably_alive(person, db_handle, today)
         return living[person.handle]
 
-    def anniversary_date(event: Event) -> tuple[int, int, int] | None:
+    def anniversary_date(event: Event) -> Union[tuple[int, int, int], None]:
         if event.handle not in date_components:
             date_components[event.handle] = _get_anniversary_date_components(event)
         return date_components[event.handle]
 
     def add_reference(
-        subject: Person | Family,
+        subject: Union[Person, Family],
         event: Event,
         components: tuple[int, int, int],
         participant: str,

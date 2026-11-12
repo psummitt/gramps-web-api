@@ -24,6 +24,7 @@ import os
 import uuid
 from http import HTTPStatus
 from typing import Any, Dict
+from typing import Union
 
 from flask import Response, current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity
@@ -62,7 +63,7 @@ class ImportersResource(ProtectedResource, GrampsJSONEncoder):
 
     @api_blueprint.response(200, ImporterSchema(many=True))
     @api_blueprint.arguments(Schema(), location="query")
-    def get(self, args, extension: str | None = None) -> Response:
+    def get(self, args, extension: Union[str, None] = None) -> Response:
         """Get all available importer attributes."""
         get_db_handle()  # needed to load plugins
         return self.response(200, get_importers())

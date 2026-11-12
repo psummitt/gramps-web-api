@@ -7,6 +7,7 @@ import json
 import os
 from functools import wraps
 from typing import Callable, Collection
+from typing import Union
 
 from flask import Response, current_app, g, request
 from flask_caching import Cache
@@ -32,7 +33,7 @@ persistent_cache = Cache()
 USER_DICT_CACHE_TIMEOUT = 60
 
 
-def get_db_last_change_timestamp(tree_id: str) -> int | float | None:
+def get_db_last_change_timestamp(tree_id: str) -> Union[Union[int, float], None]:
     """Get the last change timestamp of the database.
 
     We do this by looking at the modification time of the meta db file.
@@ -172,7 +173,7 @@ thumbnail_cache_decorator = thumbnail_cache.cached(
 )
 
 
-def _fetch_user_dict(tree: str | None, include_treeless: bool) -> dict[str, dict]:
+def _fetch_user_dict(tree: Union[str, None], include_treeless: bool) -> dict[str, dict]:
     """Get a mapping of user IDs to user names from the auth database."""
     users = get_all_user_details(
         tree=tree, include_treeless=include_treeless, include_guid=True
@@ -268,7 +269,7 @@ def _native_max_zoom_cache_key(checksum: str, bounds: list) -> str:
     return f"{checksum}:{bounds_hash}:native_max_zoom"
 
 
-def get_cached_native_max_zoom(checksum: str, bounds: list) -> int | None:
+def get_cached_native_max_zoom(checksum: str, bounds: list) -> Union[int, None]:
     """Get the cached native max zoom for a georeferenced media file, if known."""
     return persistent_cache.get(_native_max_zoom_cache_key(checksum, bounds))
 

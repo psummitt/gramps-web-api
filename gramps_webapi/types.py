@@ -37,5 +37,5 @@ MatchSegment = dict[str, Union[float, int, str, None]]
 class ProgressCallback(Protocol):
     """Protocol for progress callback functions."""
 
-    def __call__(self, current: int, total: int, prev: int | None = None) -> None:
+    def __call__(self, current: int, total: int, prev: Union[int, None] = None) -> None:
         """Call the progress callback with current progress, total items, and optional previous value."""

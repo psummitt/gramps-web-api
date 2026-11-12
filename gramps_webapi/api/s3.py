@@ -21,6 +21,7 @@
 
 from io import BytesIO
 from typing import BinaryIO, Dict, Optional
+from typing import Union
 
 from flask import current_app, redirect, send_file
 from gramps.gen.db.base import DbReadBase
@@ -186,7 +187,7 @@ class ObjectStorageFileHandler(FileHandler):
         )
         return send_file(buffer, mimetype=MIME_AVIF)
 
-    def send_map_tile(self, z: int, x: int, y: int, max_zoom: int | None = None):
+    def send_map_tile(self, z: int, x: int, y: int, max_zoom: Union[int, None] = None):
         """Send a map tile for a georeferenced image."""
         if max_zoom is not None and z > max_zoom:
             return send_file(transparent_png_tile(), mimetype=MIME_PNG)

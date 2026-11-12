@@ -1,6 +1,7 @@
 """Optional telemetry for Gramps Web API."""
 
 from __future__ import annotations
+from typing import Union
 
 import hashlib
 import hmac
@@ -22,7 +23,7 @@ from gramps_webapi.const import (
 _LOG = logging.getLogger(__name__)
 
 
-def send_telemetry(data: dict[str, str | int | float]) -> None:
+def send_telemetry(data: dict[str, Union[str, int, float]]) -> None:
     """Send telemetry, logging any network or HTTP errors."""
     try:
         response = requests.post(TELEMETRY_ENDPOINT, json=data, timeout=30)
@@ -110,7 +111,7 @@ def generate_tree_uuid(tree_id: str, server_uuid: str) -> str:
     return hmac.new(server_uuid.encode(), tree_id.encode(), hashlib.sha256).hexdigest()
 
 
-def get_telemetry_payload(tree_id: str) -> dict[str, str | int | float]:
+def get_telemetry_payload(tree_id: str) -> dict[str, Union[str, int, float]]:
     """Get the telemetry payload for the given tree ID."""
     if not tree_id:
         raise ValueError("Tree ID must not be empty")

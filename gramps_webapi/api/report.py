@@ -28,6 +28,7 @@ import uuid
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Optional
+from typing import Union
 
 from flask import abort, current_app
 from gramps.cli.plug import CommandLineReport
@@ -136,7 +137,7 @@ def get_report_profile(
 
 def get_reports(
     db_handle: DbReadBase,
-    report_id: str | None = None,
+    report_id: Union[str, None] = None,
     include_options_help: bool = True,
 ):
     """Extract and return report attributes and options."""

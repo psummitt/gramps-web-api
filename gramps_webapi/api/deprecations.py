@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import os
 from typing import Any, Callable, Iterable, Mapping
+from typing import Union
 
 from ..config import DefaultConfig
 
@@ -62,10 +63,10 @@ def _deprecation(
 
 def check_deprecations(
     config: Mapping[str, Any],
-    environ: Mapping[str, str] | None = None,
-    get_option: Callable[[str], Any] | None = None,
+    environ: Union[Mapping[str, str], None] = None,
+    get_option: Union[Callable[[str], Any], None] = None,
     db_options: Iterable[str] = (),
-    tree_backend: str | None = None,
+    tree_backend: Union[str, None] = None,
 ) -> list[dict[str, str]]:
     """Return the deprecated configuration options this deployment relies on.
 

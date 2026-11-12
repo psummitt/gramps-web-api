@@ -22,6 +22,7 @@
 import hashlib
 import json
 from typing import Dict
+from typing import Union
 
 from flask import Response
 from flask_jwt_extended import get_jwt_identity
@@ -471,7 +472,7 @@ def transaction_user_ids(transactions: list[Dict]) -> set[str]:
 
 
 def transactions_etag(
-    args: Dict, max_id: int | None, count: int, obj_key: tuple | None = None
+    args: Dict, max_id: Union[int, None], count: int, obj_key: Union[tuple, None] = None
 ) -> str:
     """Build a cache validator for a page of the transaction history.
 
@@ -488,7 +489,7 @@ def transactions_etag(
     return hashlib.sha256(state.encode()).hexdigest()
 
 
-def transactions_response(payload: str | None, count: int, etag: str) -> Response:
+def transactions_response(payload: Union[str, None], count: int, etag: str) -> Response:
     """Build the transaction history response, or a 304 if payload is None."""
     res = Response(
         response=payload,

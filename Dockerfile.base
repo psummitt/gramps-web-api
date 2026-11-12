@@ -16,7 +16,7 @@ RUN python3 -m venv /venv \
 FROM debian:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV GRAMPS_VERSION=60
+ENV GRAMPS_VERSION=51
 
 WORKDIR /app
 

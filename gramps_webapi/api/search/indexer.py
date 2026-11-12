@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import time
 from typing import Any, Dict, Iterable, List
+from typing import Union
 
 import sqlalchemy as sa
 from gramps.gen.db.base import DbReadBase
@@ -176,14 +177,14 @@ class SearchIndexer:
             )
 
     def reindex_full(
-        self, db_handle: DbReadBase, progress_cb: ProgressCallback | None = None
+        self, db_handle: DbReadBase, progress_cb: Union[ProgressCallback, None] = None
     ):
         """Reindex the whole database."""
         total = get_total_number_of_objects(db_handle)
         self._delete_all()
 
         def all_objects():
-            prev: int | None = None
+            prev: Union[int, None] = None
             for i, rows in enumerate(iter_object_rows(db_handle)):
                 yield rows
                 if progress_cb:
@@ -224,7 +225,7 @@ class SearchIndexer:
         return result
 
     def reindex_incremental(
-        self, db_handle: DbReadBase, progress_cb: ProgressCallback | None = None
+        self, db_handle: DbReadBase, progress_cb: Union[ProgressCallback, None] = None
     ):
         """Update the index incrementally.
 
@@ -290,11 +291,11 @@ class SearchIndexer:
         page: int,
         pagesize: int,
         include_private: bool = True,
-        sort: List[str] | None = None,
-        object_types: List[str] | None = None,
-        change_op: str | None = None,
-        change_value: float | None = None,
-        locale: GrampsLocale | None = None,
+        sort: Union[List[str], None] = None,
+        object_types: Union[List[str], None] = None,
+        change_op: Union[str, None] = None,
+        change_value: Union[float, None] = None,
+        locale: Union[GrampsLocale, None] = None,
     ):
         """Search the index.
 

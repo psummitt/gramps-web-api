@@ -27,6 +27,7 @@ import time
 import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO, Callable, List, Optional, Set
+from typing import Union
 
 from flask import current_app
 from flask_jwt_extended import get_jwt_identity
@@ -97,7 +98,7 @@ def get_archive_name(db_handle: DbReadBase, include_private: bool) -> str:
     return f"{sha256.hexdigest()}.zip"
 
 
-def get_local_archive_dir(tree: str | None = None) -> str:
+def get_local_archive_dir(tree: Union[str, None] = None) -> str:
     """Return the directory holding local media archives, of one tree or of all."""
     archive_dir = os.path.join(current_app.config["EXPORT_DIR"], ARCHIVE_DIR)
     if tree is None:
@@ -105,7 +106,7 @@ def get_local_archive_dir(tree: str | None = None) -> str:
     return os.path.abspath(os.path.join(archive_dir, tree))
 
 
-def get_contained_path(base_dir: FilenameOrPath, path: FilenameOrPath) -> Path | None:
+def get_contained_path(base_dir: FilenameOrPath, path: FilenameOrPath) -> Union[Path, None]:
     """Return the resolved path of a media file, or None if outside the base dir."""
     try:
         base_path = Path(base_dir).resolve()
@@ -189,7 +190,7 @@ class MediaHandlerBase:
 
     def get_file_archive_info(
         self, tree: str, file_name: str
-    ) -> tuple[float, int] | None:
+    ) -> Union[tuple[float, int], None]:
         """Return the creation time and size of a media archive, if it exists."""
         raise NotImplementedError
 
@@ -285,7 +286,7 @@ class MediaHandlerLocal(MediaHandlerBase):
 
     def get_file_archive_info(
         self, tree: str, file_name: str
-    ) -> tuple[float, int] | None:
+    ) -> Union[tuple[float, int], None]:
         """Return the creation time and size of a media archive, if it exists."""
         path = os.path.join(get_local_archive_dir(tree), file_name)
         try:
@@ -430,7 +431,7 @@ class MediaHandlerS3(MediaHandlerBase):
         zip_filename: FilenameOrPath,
         tree: str,
         retention: float,
-        file_name: str | None = None,
+        file_name: Union[str, None] = None,
     ) -> None:
         """Upload a media archive and delete expired archives.
 
@@ -457,7 +458,7 @@ class MediaHandlerS3(MediaHandlerBase):
 
     def get_file_archive_info(
         self, tree: str, file_name: str
-    ) -> tuple[float, int] | None:
+    ) -> Union[tuple[float, int], None]:
         """Return the creation time and size of a media archive, if it exists."""
         from botocore.exceptions import ClientError
 
@@ -475,7 +476,7 @@ class MediaHandlerS3(MediaHandlerBase):
 
     def get_file_archive_url(
         self, tree: str, file_name: str, retention: float
-    ) -> str | None:
+    ) -> Union[str, None]:
         """Return a presigned download URL for an unexpired media archive."""
         from botocore.exceptions import ClientError
 

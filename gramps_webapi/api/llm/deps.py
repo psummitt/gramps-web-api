@@ -1,3 +1,4 @@
+from typing import Union
 #
 # Gramps Web API - A RESTful API for the Gramps genealogy program
 #
@@ -31,4 +32,4 @@ class AgentDeps:
     include_private: bool
     max_context_length: int
     user_id: str
-    progress_callback: Callable[[str, str], None] | None = field(default=None)
+    progress_callback: Union[Callable[[str, str], None], None] = field(default=None)

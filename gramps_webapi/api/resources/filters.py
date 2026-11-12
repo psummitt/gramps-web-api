@@ -29,10 +29,10 @@ from collections import defaultdict
 from collections.abc import Callable
 from functools import lru_cache
 from typing import Any
+from typing import Union
 
 import gramps.gen.filters as filters
 from flask import Response, abort, current_app
-from gramps.gen.db import Database
 from gramps.gen.db.base import DbReadBase
 from gramps.gen.errors import FilterError
 from gramps.gen.filters import GenericFilter
@@ -131,10 +131,10 @@ class MatchesQuery(Rule):
     category = "General filters"
     spec: ObjectTypeSpec
 
-    def prepare(self, db: Database, user) -> None:
+    def prepare(self, db: DbReadBase, user) -> None:
         # raises QueryLangError (a ValueError) for invalid expressions
         self.where = compile_expr_for_spec(self.spec, self.list[0])
-        self.selected_handles: set[Handle] | None = None
+        self.selected_handles: Union[set[Handle], None] = None
         dbapi = getattr(db, "dbapi", None)
         # SQL would match private data of a restricted database
         if isinstance(db, (ProxyDbBase, RestrictedDb)) or dbapi is None:
@@ -295,7 +295,7 @@ def _addon_translation(
 
 def get_addon_translation(
     rule_class: type[Rule], languages: list[str]
-) -> gettext.NullTranslations | None:
+) -> Union[gettext.NullTranslations, None]:
     """Return the translations of the addon defining a rule.
 
     Addons keep their translations next to their code, in
@@ -549,7 +549,7 @@ def apply_filter(
     db_handle: DbReadBase,
     args: dict[str, Any],
     namespace: str,
-    handles: list[Handle] | None = None,
+    handles: Union[list[Handle], None] = None,
 ) -> list[Handle]:
     """Apply an existing or dynamically defined filter."""
     filters.reload_custom_filters()

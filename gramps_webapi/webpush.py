@@ -15,6 +15,7 @@ import base64
 import json
 from functools import lru_cache
 from typing import Any, Mapping
+from typing import Union
 from urllib.parse import urlsplit
 
 from cryptography.hazmat.primitives import hashes, serialization
@@ -58,7 +59,7 @@ def _derive_vapid_key(secret_key: bytes) -> tuple[Vapid, str]:
     return Vapid(private_key, conf={"no-strict": True}), public_key
 
 
-def get_web_push_config() -> tuple[Vapid, str, str] | None:
+def get_web_push_config() -> Union[tuple[Vapid, str, str], None]:
     """Return VAPID credentials from the existing secret and HTTPS base URL."""
     secret_key = current_app.config.get("SECRET_KEY")
     base_url = current_app.config.get("BASE_URL")

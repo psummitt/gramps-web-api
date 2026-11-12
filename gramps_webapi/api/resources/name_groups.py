@@ -20,6 +20,7 @@
 """Name Groups API resource."""
 
 from __future__ import annotations
+from typing import Union
 
 from flask import Response, abort
 from gramps.gen.db.base import DbReadBase
@@ -51,7 +52,7 @@ class NameGroupsResource(ProtectedResource, GrampsJSONEncoder):
     """Name group mappings resource."""
 
     @api_blueprint.response(200, NameGroupSchema(many=True))
-    def get(self, surname: str | None = None) -> Response:
+    def get(self, surname: Union[str, None] = None) -> Response:
         """Get list of name group mappings."""
         db_handle = get_db_handle()
         if surname is not None:
@@ -72,7 +73,7 @@ class NameGroupsResource(ProtectedResource, GrampsJSONEncoder):
         return self.response(200, mappings)
 
     @api_blueprint.response(201, NameGroupSchema)
-    def post(self, surname: str | None = None, group: str | None = None) -> Response:
+    def post(self, surname: Union[str, None] = None, group: Union[str, None] = None) -> Response:
         """Set a name group mapping."""
         require_permissions([PERM_EDIT_NAME_GROUP])
         if surname is None or group is None or len(surname) == 0 or len(group) == 0:
